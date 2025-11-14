@@ -103,7 +103,7 @@ source .venv/bin/activate  # Linux/Mac
 
 3. Install dependencies
 ```sh
-uv add pyproject.toml
+uv pip install -r requirements.txt
 ```
 
 4. Start the backend service

@@ -1,0 +1,133 @@
+{
+  "title": "Tender Review Dashboard",
+  "cardsTitle": "Overview Statistics",
+  "cards": [
+    {
+      "title": "Full Processing Time",
+      "value": "92",
+      "timeUnit": "minutes",
+      "description": "Total processing time per tender",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#18a058",
+      "trend": {
+        "value": "43%",
+        "direction": "up",
+        "label": "from last month",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Upload Time (File Transfer)",
+      "value": "6",
+      "timeUnit": "minutes",
+      "description": "Average per tender document",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#2d8cf0",
+      "trend": {
+        "value": "5%",
+        "direction": "up",
+        "label": "this month",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Ingestion Time",
+      "value": "34",
+      "timeUnit": "seconds",
+      "description": "Average per document page",
+      "icon": "ArrowDownload20Filled",
+      "iconColor": "#f0a020",
+      "trend": {
+        "value": "7%",
+        "direction": "up",
+        "label": "improvement",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Processing Time",
+      "value": "52",
+      "timeUnit": "minutes",
+      "description": "Average per tender document",
+      "icon": "TabDesktopClock20Regular",
+      "iconColor": "#00b2a9",
+      "trend": {
+        "value": "2%",
+        "direction": "down",
+        "label": "from last month",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Total Tenders",
+      "value": "47",
+      "timeUnit": "",
+      "description": "Average tender document",
+      "icon": "Document28Regular",
+      "iconColor": "#8e44ad",
+      "trend": {
+        "value": "8%",
+        "direction": "up",
+        "label": "this month",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Completed Review",
+      "value": "34",
+      "timeUnit": "",
+      "description": "Fully analysed and approved",
+      "icon": "ColorLine16Regular",
+      "iconColor": "#18a058",
+      "trend": {
+        "value": "72%",
+        "direction": "up",
+        "label": "completion rate",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Unsuccessful Processed Documents",
+      "value": "12",
+      "timeUnit": "",
+      "description": "Require immediate attention",
+      "icon": "DismissCircle28Regular",
+      "iconColor": "#d03050",
+      "trend": {
+        "value": "3%",
+        "direction": "down",
+        "label": "from last month",
+        "color": "#18a058"
+      }
+    },
+    {
+      "title": "Full Processing Time",
+      "value": "92",
+      "timeUnit": "minutes",
+      "description": "Total processing time per tender",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#f0a020",
+      "trend": {
+        "value": "43%",
+        "direction": "up",
+        "label": "from last month",
+        "color": "#18a058"
+      }
+    }
+  ],
+  "tableTitle": "Tender Document",
+  "tableColumns": [
+    { "title": "Tender Name", "key": "name" },
+    { "title": "Folder", "key": "folder" },
+    { "title": "Client", "key": "client" },
+    { "title": "Status", "key": "status" },
+    { "title": "Issues Found", "key": "issues" },
+    { "title": "Analysis", "key": "analysis" },
+    { "title": "Actions", "key": "actions" }
+  ],
+  "statusOptions": [
+    { "label": "Completed", "value": "Completed" },
+    { "label": "In Review", "value": "In Review" },
+    { "label": "Doc Error", "value": "Doc Error" }
+  ]
+}

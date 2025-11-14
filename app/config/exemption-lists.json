@@ -1,0 +1,34 @@
+{
+  "title": "Exemption Lists",
+  "description": "Set predefined exemptions that affect the analysis of each issue.",
+  "modules": [
+    { 
+      "components": [
+        {
+          "type": "select",
+          "label": "Project Type",
+          "model": "projectType",
+          "required": true,
+          "placeholder": "Select project type",
+          "options": [
+            { "label": "Standard Commercial", "value": "Standard Commercial" },
+            { "label": "Residential", "value": "Residential" },
+            { "label": "Industrial", "value": "Industrial" }
+          ]
+        },
+        {
+          "type": "select",
+          "label": "Region",
+          "model": "region",
+          "required": true,
+          "placeholder": "Select region",
+          "options": [
+            { "label": "Europe", "value": "Europe" },
+            { "label": "Asia", "value": "Asia" },
+            { "label": "North America", "value": "North America" }
+          ]
+        }
+      ]
+    }
+  ]
+}

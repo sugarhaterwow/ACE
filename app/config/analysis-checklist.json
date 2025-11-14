@@ -1,0 +1,24 @@
+{
+  "title": "Analysis Checklist",
+  "description": "Select the item you want the systems to analyse in your tender document.",
+  
+  "selectA": "Select Checklist",
+  "selectB": "Select Criteria Profile",
+  "optionsA": [
+    { "label": "Construction Checklist", "value": "Construction Checklist" }
+  ],
+  "optionsB": [
+    { "label": "Singapore", "value": "Singapore" },
+    { "label": "Hong Kong", "value": "Hong Kong" }
+  ],
+  "tableColumns": [
+    { "type": "selection", "width": 60, "align": "center" },
+    { "title": "Item", "key": "item", "align": "center", "ellipsis": { "tooltip": true } },
+    { "title": "Search Entities", "key": "search_entities", "align": "center", "customRender": true },
+    { "title": "Analysis Type", "key": "analysis_type", "align": "center", "ellipsis": { "tooltip": true } }
+  ]
+
+}
+
+
+

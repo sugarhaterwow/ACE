@@ -1,0 +1,50 @@
+{
+  "title": "Analysis Result ",
+  "description": "Project ABC Construction —— Tender Document Analysis",
+  "modal": {
+    "title": "Analysing Your Document...",
+    "description": "Please wait while your document is being processed for analysis.",
+    "stages": [
+      "Ingestion",
+      "Entity Extraction",
+      "Search and Highlight",
+      "Clause Alignment",
+      "Finished ✅"
+    ]
+  },
+  "cards": [
+    {
+      "title": "Total Items",
+      "subLabel": "Checklist items",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#3b82f6",
+      "key": "total"
+    },
+    {
+      "title": "Found Info",
+      "subLabel": "Extracted items",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#18a058",
+      "key": "found"
+    },
+    {
+      "title": "Compliant",
+      "subLabel": "Requirements",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#facc15",
+      "key": "compliant"
+    },
+    {
+      "title": "Issue",
+      "subLabel": "found",
+      "icon": "ApprovalsApp16Regular",
+      "iconColor": "#f97316",
+      "key": "issue"
+    }
+  ],
+  "modules": [
+    { "label": "Search and Highlight", "value": "search_highlight" },
+    { "label": "Clause Alignment", "value": "clause_alignment" },
+    { "label": "Issues", "value": "issues" }
+  ]
+}

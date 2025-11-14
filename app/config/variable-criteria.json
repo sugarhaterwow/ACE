@@ -1,0 +1,45 @@
+{
+  "title": "Variable Criteria",
+  "description": "Set specific requirements for items that have compliance criteria. These can vary by project scenarios.",
+  "modules": [
+    {
+      "title": "Installation Period Requirements",
+      "components": [
+        {
+          "type": "input",
+          "label": "Minimum Period",
+          "required": true,
+          "placeholder": "e.g. 3 weeks"
+        },
+        {
+          "type": "select",
+          "label": "Units",
+          "required": true,
+          "placeholder": "Select unit",
+          "options": [
+            { "label": "Days", "value": "Days" },
+            { "label": "Weeks", "value": "Weeks" },
+            { "label": "Months", "value": "Months" }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Liability Limits",
+      "components": [
+        {
+          "type": "input",
+          "label": "Maximum Liability",
+          "required": false,
+          "placeholder": "e.g. 100"
+        },
+        {
+          "type": "input",
+          "label": "Insurance Minimum",
+          "required": true,
+          "placeholder": "e.g. $1 M USD"
+        }
+      ]
+    }
+  ]
+}

@@ -28,7 +28,7 @@ function buildRoutes(routes = []) {
       route.children = e.children.map((e_child) => ({
         name: e_child.name,
         path: e_child.path,
-        component: vueModules[`/src/views${e_child.component}/index.vue`],
+        component: vueModules[`/src/views/workbench/${e_child.component}/index.vue`],
         isHidden: e_child.is_hidden,
         meta: {
           title: e_child.name,
@@ -42,7 +42,7 @@ function buildRoutes(routes = []) {
       route.children.push({
         name: `${e.name}Default`,
         path: '',
-        component: vueModules[`/src/views${e.component}/index.vue`],
+        component: vueModules[`/src/views/workbench/${e.component}/index.vue`],
         isHidden: true,
         meta: {
           title: e.name,

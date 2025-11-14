@@ -69,7 +69,6 @@ class Dept(BaseModel, TimestampMixin):
     class Meta:
         table = "dept"
 
-
 class DeptClosure(BaseModel, TimestampMixin):
     ancestor = fields.IntField(description="父代", index=True)
     descendant = fields.IntField(description="子代", index=True)
@@ -87,3 +86,17 @@ class AuditLog(BaseModel, TimestampMixin):
     response_time = fields.IntField(default=0, description="响应时间(单位ms)", index=True)
     request_args = fields.JSONField(null=True, description="请求参数")
     response_body = fields.JSONField(null=True, description="返回数据")
+
+
+class Tender(BaseModel, TimestampMixin):
+    """投标书表"""
+    name = fields.CharField(max_length=255, description="投标书名称", index=True)
+    folder = fields.CharField(max_length=255, description="所属文件夹", null=True, index=True)
+    client = fields.CharField(max_length=255, description="客户名称", null=True, index=True)
+    status = fields.CharField(max_length=50, description="状态", index=True)
+    analysis = fields.DateField(description="分析日期", null=True, index=True)
+    description = fields.TextField(description="投标书描述", null=True)
+
+    class Meta:
+        table = "tender"
+        table_description = "投标书信息表"

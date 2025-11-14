@@ -3,7 +3,14 @@
     <header v-if="showHeader" mb-15 min-h-45 flex items-center justify-between px-15>
       <slot v-if="$slots.header" name="header" />
       <template v-else>
-        <h2 text-22 font-normal text-hex-333 dark:text-hex-ccc>{{ title || route.meta?.title }}</h2>
+        <div class="flex flex-col">
+          <h1 class="text-30 font-bold text-hex-333 mb-3 dark:text-hex-ccc">
+            {{ title || route.meta?.title }}
+          </h1>
+          <p v-if="subTitle" class="text-14 text-gray-500 mt-1">
+            {{ subTitle }}
+          </p>
+        </div>
         <slot name="action" />
       </template>
     </header>
@@ -28,6 +35,10 @@ defineProps({
     type: String,
     default: undefined,
   },
+  subTitle: {
+    type: String,
+    default: undefined,
+  }
 })
 const route = useRoute()
 </script>

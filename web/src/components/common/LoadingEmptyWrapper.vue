@@ -37,7 +37,7 @@ const props = {
   empty: false,
   loadingSize: 'medium',
   placeholderClass: 'bg-white dark:bg-dark transition-background-color duration-300 ease-in-out',
-  emptyDesc: '暂无数据',
+  emptyDesc: 'No data found',
   iconClass: 'text-320px text-primary',
   descClass: 'text-16px text-#666',
   showNetworkReload: false,

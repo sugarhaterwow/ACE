@@ -1,0 +1,27 @@
+[
+    {
+      "id": 1,
+      "item": "Customer Information",
+      "search_entities": ["Customer Name", "Contact Details", "Company Type"],
+      "analysis_type": "Search & Highlight"
+    },
+    {
+      "id": 2,
+      "item": "Project Location",
+      "search_entities": ["Address", "City", "Country"],
+      "analysis_type": "Search & Highlight"
+    },
+    {
+      "id": 3,
+      "item": "Installation Period",
+      "search_entities": ["Timeline", "Deadline", "Milestone"],
+      "analysis_type": "Search & Highlight"
+    },
+    {
+      "id": 4,
+      "item": "Payment Terms",
+      "search_entities": ["Payment Schedule", "Currency", "Tax Obligations"],
+      "analysis_type": "Search & Highlight"
+    }
+  ]
+  

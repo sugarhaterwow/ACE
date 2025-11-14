@@ -1,0 +1,155 @@
+{
+    "metricData": {
+        "total": 8,
+        "found": 4,
+        "compliant": 2,
+        "issue": 2
+    },
+    "search_highlight": [
+        {
+            "title": "Commencement and Completion Programme",
+            "pdfName": "EUSFTA_Chap6",
+            "records": [
+                {
+                    "ans": "Customer Information",
+                    "detail": "Best Vision Development Limited",
+                    "description": "Remarks: The customer is Best Vision Development Limited. This is found on Page 179 under the Definitions and Interpretation section, where it states that wherever the term 'Employer/Developer' is used, it refers to Best Vision Development Limited.",
+                    "page": 10,
+                    "others": [2, 5]
+                },
+                {
+                    "ans": "Project Location",
+                    "detail": "Tin Shui Wan Town Lot No.23, Tin Shui Wai, New Territorie",
+                    "description": "Remarks: The project site is located at Tin Shui Wai Town Lot No.23, Tin Shui Wai, New Territories, This Information is found on page 183, 344, 470 and 67.",
+                    "page": 3,
+                    "others": [1, 4]
+                }
+            ]
+        },
+        {
+            "title": "Total Contract / Liability and Consequential Damages",
+            "pdfName": "EUSFTA_Chap7",
+            "records": [
+            {
+                    "ans": "Project Location",
+                    "detail": "Tin Shui Wan Town Lot No.23, Tin Shui Wai, New Territorie",
+                    "description": "Remarks: ...",
+                    "page": 2,
+                    "others": [5]
+                }
+            ]
+        },
+        {
+            "title": "Warranty / Defeat Liability Period / Free Maintenance Period",
+            "pdfName": "EUSFTA_Chap8",
+            "records": [
+                {
+                    "ans": "Customer Information",
+                    "detail": "Best Vision Development Limited",
+                    "description": "Remarks: ...",
+                    "page": 3,
+                    "others": [6]
+                }
+            ]
+        } 
+    ],
+    "clause_alignment": [
+        {
+            "title": "Commencement and Completion Programme",
+            "pdfName": "EUSFTA_Chap9",
+            "records": [
+                {
+                    "ans": "Installation period should not be less than 3 weeks",
+                    "description": "Clause 3.14 specifies that the Sub - Contractor shall complete the lift installation works within 60 calendar days upon possession of respective life machine rooms from the main contractor. This timeframe is significantly longer than the 3 - week requirement mentioned provided in the document, the installation cannot be guaranteed to meet the requirement of not being less than 3 weeks.",
+                    "status": false,
+                    "res": "non-compliant",
+                    "page": 12,
+                    "others": [2]
+                },
+                {
+                    "ans": "Defects Inspection should not be less than 2 months",
+                    "description": "Based on Clause 3.28, the defect inspection and rectification process indeed spans on a total of two months (one month for inspection and one month for rectification). Therefore, the defect inspection process, as outlined, should not be less than 2 months.",
+                    "status": true,
+                    "res": "compliant",
+                    "page": 8,
+                    "others": [4]
+                }
+            ]
+          },
+          {
+            "title": "Extension of Time",
+            "pdfName": "EUSFTA_Chap10",
+            "records": [
+                {
+                    "ans": "Project Location",
+                    "descrition": "Tin Shui Wan Town Lot No.23, Tin Shui Wai, New Territorie",
+                    "status": false,
+                    "res": "non-compliant",
+                    "page": 2,
+                    "others": [9]
+                }
+            ]
+          },
+          {
+            "title": "Liquidated Damages Delay Penalty",
+            "pdfName": "EUSFTA_Chap11",
+            "records": [
+                {
+                    "ans": "Customer Information",
+                    "description": "Best Vision Development Limited",
+                    "status": false,
+                    "res": "non-compliant",
+                    "page": 3,
+                    "others": [7]
+                }
+            ]
+          }
+      ],
+      "issues": [
+        {
+            "title": "Warranty / Defeat Liability Period / Free Maintenance Period",
+            "pdfName": "EUSFTA_Chap12",
+            "records": [
+                {
+                    "ans": "Customer Information",
+                    "detail": "Customer Name",
+                    "description": "Remarks: -",
+                    "status": false,
+                    "res": "Missing required clause",
+                    "page": "-",
+                    "others": ["-"]
+                }
+            ]
+          },
+          {
+            "title": "Commencement and Completion Programme",
+            "pdfName": "EUSFTA_Chap13",
+            "records": [
+                {
+                    "ans": "Installation period should not be less than 3 weeks",
+                    "detail": "",
+                    "description": "Based on Clause 3.28, the defect inspection and rectification process indeed spans on a total of two months (one month for inspection and one month for rectification). Therefore, the defect inspection process, as outlined, should not be less than 2 months.",
+                    "status": false,
+                    "res": "non-compliant",
+                    "page": 12,
+                    "others": [19]
+                }
+            ]
+          },
+          {
+            "title": "Extension of Time",
+            "pdfName": "EUSFTA_Chap14",
+            "records": [
+                {
+                    "ans": "Installation period should not be less than 3 weeks",
+                    "detail": "",
+                    "description": "Based on Clause 3.28, the defect inspection and rectification process indeed spans on a total of two months (one month for inspection and one month for rectification). Therefore, the defect inspection process, as outlined, should not be less than 2 months.",
+                    "status": false,
+                    "res": "non-compliant",
+                    "page": 6,
+                    "others": [13]
+                }
+            ]
+          }
+      ]
+}

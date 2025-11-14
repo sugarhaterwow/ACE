@@ -1,6 +1,6 @@
 <template>
   <router-link h-60 f-c-c to="/">
-    <icon-custom-logo text-36 color-primary></icon-custom-logo>
+    <img src="@/assets/til.png" alt="Logo" style="height: 36px;" />
     <h2
       v-show="!appStore.collapsed"
       ml-2

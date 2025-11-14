@@ -16,15 +16,27 @@
       "message_login_success": "登录成功"
     },
     "workbench": {
-      "label_workbench": "工作台",
-      "text_hello": "hello, {username}",
-      "text_welcome": "今天又是元气满满的一天!",
-      "label_number_of_items": "项目数",
-      "label_upcoming": "待办",
-      "label_information": "消息",
-      "label_project": "项目",
-      "label_more": "更多"
+      "label_application": "应用",
+      "label_dashboard": "仪表盘",
+      "label_tender_review": "招标评审",
+      "label_contract_review": "合同评审",
+      "label_search_document": "文档搜索",
+      "label_clause_recommender": "条款推荐器",
+      "label_default_review_criteria": "默认评审标准",
+      "label_review_profile": "查看档案",
+      "label_user_management": "用户管理"
     },
+    "review_dashboard": {
+      "card1": "评审仪表盘",
+      "card2": "总投标数",
+      "card3": "总评审数",
+      "card4": "平均分",
+      "card5": "各时间段投标数",
+      "card6": "各时间段评审数",
+      "card7": "各时间段平均分"
+
+    },
+
     "profile": {
       "label_profile": "个人中心",
       "label_modify_information": "修改信息",

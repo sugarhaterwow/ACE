@@ -1,8 +1,13 @@
 <template>
   <div v-bind="$attrs">
+    <div v-if="tableTitle" style="font-size: 20px; margin-bottom: 10px;">
+      {{ tableTitle }}
+    </div>
+
     <QueryBar v-if="$slots.queryBar" mb-30 @search="handleSearch" @reset="handleReset">
       <slot name="queryBar" />
     </QueryBar>
+    
 
     <n-data-table
       :remote="remote"
@@ -12,6 +17,7 @@
       :scroll-x="scrollX"
       :row-key="(row) => row[rowKey]"
       :pagination="isPagination ? pagination : false"
+      :checked-row-keys="checkedRowKeys"
       @update:checked-row-keys="onChecked"
       @update:page="onPageChange"
     />
@@ -20,6 +26,10 @@
 
 <script setup>
 const props = defineProps({
+  tableTitle: {
+    type: String,
+    default: ''
+  },
   /**
    * @remote true: 后端分页  false： 前端分页
    */
@@ -70,9 +80,19 @@ const props = defineProps({
     type: Function,
     required: true,
   },
+  checkedRowKeys: {
+    type: Array,
+    default: () => []
+  }
 })
 
-const emit = defineEmits(['update:queryItems', 'onChecked', 'onDataChange'])
+const emit = defineEmits([
+  'update:queryItems',
+  'onChecked',
+  'onDataChange',
+  'update:checked-row-keys'
+])
+
 const loading = ref(false)
 const initQuery = { ...props.queryItems }
 const tableData = ref([])
@@ -82,7 +102,7 @@ const pagination = reactive({
   pageSizes: [10, 20, 50, 100],
   showSizePicker: true,
   prefix({ itemCount }) {
-    return `共 ${itemCount} 条`
+    return `Total ${itemCount} items`
   },
   onChange: (page) => {
     pagination.page = page
@@ -93,6 +113,9 @@ const pagination = reactive({
     handleQuery()
   },
 })
+
+
+
 
 async function handleQuery() {
   try {
@@ -108,11 +131,13 @@ async function handleQuery() {
       ...paginationParams,
     })
     tableData.value = data
+    
     pagination.itemCount = total || 0
   } catch (error) {
     tableData.value = []
     pagination.itemCount = 0
   } finally {
+    console.log('onDataChange', tableData.value)
     emit('onDataChange', tableData.value)
     loading.value = false
   }

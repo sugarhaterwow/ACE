@@ -1,0 +1,32 @@
+{
+    "title": "Clause Recommender",
+    "subtitle": "Search the repository for clauses used in similar context documents",
+    "tableColumns": [
+        {
+          "title": "Item",
+          "key": "item",
+          "align": "center",
+          "ellipsis": true
+        },
+        {
+          "title": "Search Entities",
+          "key": "search_entities",
+          "align": "center",
+          "ellipsis": true
+        },
+        {
+          "title": "Action",
+          "key": "action",
+          "align": "center",
+          "type": "switch"
+        },
+        {
+          "title": "Analysis Type",
+          "key": "analysis_type",
+          "align": "center",
+          "ellipsis": true
+        }
+      ]
+    
+  }
+  

@@ -1,9 +1,9 @@
 [project]
-name = "vue-fastapi-admin"
+name = "w"
 version = "0.1.0"
-description = "Vue Fastapi admin"
+description = "ACE"
 authors = [
-    {name = "mizhexiaoxiao", email = "mizhexiaoxiao@gmail.com"},
+    {name = "huangyufei", email = "sugarhaterwow@gmail.com"},
 ]
 requires-python = ">=3.11"
 dependencies = [

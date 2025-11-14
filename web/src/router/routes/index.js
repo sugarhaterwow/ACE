@@ -6,24 +6,116 @@ const Layout = () => import('@/layout/index.vue')
 export const basicRoutes = [
   {
     path: '/',
-    redirect: '/workbench', // 默认跳转到首页
+    redirect: '/workbench/overview', // 默认跳转到首页
     meta: { order: 0 },
   },
   {
-    name: t('views.workbench.label_workbench'),
+    name: t('views.workbench.label_application'),
     path: '/workbench',
     component: Layout,
     children: [
+      // {
+      //   path: '',
+      //   component: () => import('@/views/workbench/index.vue'),
+      //   name: `${t('views.workbench.label_workbench')}Default`,
+      //   meta: {
+      //     title: t('views.workbench.label_workbench'),
+      //     icon: 'icon-park-outline:workbench',
+      //     affix: true,
+      //   },
+      // },
+  
       {
-        path: '',
-        component: () => import('@/views/workbench/index.vue'),
-        name: `${t('views.workbench.label_workbench')}Default`,
+        path: 'overview',
+        name: 'WorkbenchOverview',
+        component: () => import('@/views/workbench/dashboard/index.vue'),
         meta: {
-          title: t('views.workbench.label_workbench'),
-          icon: 'icon-park-outline:workbench',
-          affix: true,
+          title: t('views.workbench.label_dashboard'),
+          icon: 'mdi:view-dashboard-outline',
         },
       },
+      {
+        path: 'tender-review',
+        name: 'WorkbenchTenderReview',
+        component: () => import('@/views/workbench/tender-review/index.vue'),
+        meta: {
+          title: t('views.workbench.label_tender_review'),
+          icon: 'mdi:clipboard-check-outline',
+        },
+      },
+      {
+        path: 'contract-review',
+        name: 'WorkbenchContractReview',
+        component: () => import('@/views/workbench/contract-review/index.vue'),
+        meta: {
+          title: t('views.workbench.label_contract_review'),
+          icon: 'mdi:clipboard-check-outline',
+        },
+      },
+      {
+        path: 'search-document',
+        name: 'WorkbenchSearchDocument',
+        component: () => import('@/views/workbench/search-document/index.vue'),
+        meta: {
+          title: t('views.workbench.label_search_document'),
+          icon: 'mdi:file-search-outline',
+        },
+      },
+      {
+        path: 'clause-recommender',
+        name: 'WorkbenchClauseRecommender',
+        component: () => import('@/views/workbench/clause-recommender/index.vue'),
+        meta: {
+          title: t('views.workbench.label_clause_recommender'),
+          icon: 'mdi:lightbulb-outline',
+        },
+      },
+      {
+        path: 'default-review-criteria',
+        name: 'WorkbenchDefaultReviewCriteria',
+        component: () => import('@/views/workbench/review-criteria/index.vue'),
+        meta: {
+          title: t('views.workbench.label_default_review_criteria'),
+          icon: 'mdi:check-decagram-outline',
+        },
+      },
+      {
+        path: 'review-profile',
+        name: 'WorkbenchReviewProfile',
+        meta: {
+          title: t('views.workbench.label_review_profile'),
+          icon: 'mdi:clipboard-text-outline',
+        },
+        children: [
+          {
+            path: 'tender', // 子路由
+            name: 'WorkbenchReviewProfileTender',
+            component: () => import('@/views/workbench/review-profile/tender.vue'),
+            meta: {
+              title: 'Tender',
+              icon: 'mdi:file-document-edit-outline'
+            },
+          },
+          {
+            path: 'contract', // 子路由
+            name: 'WorkbenchReviewProfileContract',
+            component: () => import('@/views/workbench/review-profile/contract.vue'),
+            meta: {
+              title: 'Contract',
+              icon: 'mdi:file-sign'
+            },
+          },
+        ],
+      },
+      {
+        path: 'user-management',
+        name: 'WorkbenchUserManagement',
+        component: () => import('@/views/workbench/user-management/index.vue'),
+        meta: {
+          title: t('views.workbench.label_user_management'),
+          icon: 'mdi:account-group-outline',
+        },
+      }
     ],
     meta: { order: 1 },
   },
@@ -51,6 +143,7 @@ export const basicRoutes = [
     path: '/error-page',
     component: Layout,
     redirect: '/error-page/404',
+    isHidden: true,
     meta: {
       title: t('views.errors.label_error'),
       icon: 'mdi:alert-circle-outline',
@@ -130,6 +223,7 @@ export const EMPTY_ROUTE = {
   path: '/:pathMatch(.*)*',
   component: null,
 }
+  
 
 const modules = import.meta.glob('@/views/**/route.js', { eager: true })
 const asyncRoutes = []

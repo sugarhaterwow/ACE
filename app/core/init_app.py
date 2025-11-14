@@ -33,10 +33,10 @@ def make_middlewares():
     middleware = [
         Middleware(
             CORSMiddleware,
-            allow_origins=settings.CORS_ORIGINS,
+            allow_origins=settings.CORS_ORIGINS, # 允许所有域名访问，生产环境建议写具体域名
             allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
-            allow_methods=settings.CORS_ALLOW_METHODS,
-            allow_headers=settings.CORS_ALLOW_HEADERS,
+            allow_methods=settings.CORS_ALLOW_METHODS, # 允许所有请求方法：GET, POST, PUT, DELETE...
+            allow_headers=settings.CORS_ALLOW_HEADERS, # 允许所有请求头
         ),
         Middleware(BackGroundTaskMiddleware),
         Middleware(
@@ -53,10 +53,19 @@ def make_middlewares():
 
 
 def register_exceptions(app: FastAPI):
+     # 当数据库里查不到对象时（DoesNotExist），交给 DoesNotExistHandle 来处理
     app.add_exception_handler(DoesNotExist, DoesNotExistHandle)
+
+    # 当抛出 HTTPException 时，交给 HttpExcHandle 来处理
     app.add_exception_handler(HTTPException, HttpExcHandle)
+
+    # 当数据库约束冲突（IntegrityError，比如唯一键重复）时，交给 IntegrityHandle 来处理
     app.add_exception_handler(IntegrityError, IntegrityHandle)
+
+    # 当请求参数校验失败（RequestValidationError）时，交给 RequestValidationHandle 来处理
     app.add_exception_handler(RequestValidationError, RequestValidationHandle)
+
+    # 当响应数据校验失败（ResponseValidationError）时，交给 ResponseValidationHandle 来处理
     app.add_exception_handler(ResponseValidationError, ResponseValidationHandle)
 
 
@@ -228,6 +237,6 @@ async def init_roles():
 async def init_data():
     await init_db()
     await init_superuser()
-    await init_menus()
+    # await init_menus()
     await init_apis()
     await init_roles()

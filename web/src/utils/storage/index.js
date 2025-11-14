@@ -16,6 +16,7 @@ export const createSessionStorage = function (option = {}) {
   })
 }
 
+// 创建一个本地永久存储实例
 export const lStorage = createLocalStorage({ prefixKey })
-
+// 创建一个会话临时存储实例
 export const sStorage = createSessionStorage({ prefixKey })

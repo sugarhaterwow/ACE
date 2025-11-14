@@ -1,0 +1,43 @@
+[
+    {
+      "name": "Sarah Lee",
+      "email": "sarahlee@company.com",
+      "role": "Viewer",
+      "lastActive": "60 minutes ago",
+      "status": "active",
+      "departments": "Engineering"
+    },
+    {
+      "name": "Victoria",
+      "email": "victoria@company.com",
+      "role": "Admin",
+      "lastActive": "15 minutes ago",
+      "status": "active",
+      "departments": "Marketing"
+    },
+    {
+      "name": "John",
+      "email": "john@company.com",
+      "role": "Viewer",
+      "lastActive": "2 hours ago",
+      "status": "active",
+      "departments": "Sales"
+    },
+    {
+      "name": "Elias",
+      "email": "eliaslee@company.com",
+      "role": "Reviewer",
+      "lastActive": "1 hour ago",
+      "status": "active",
+      "departments": "Engineering"
+    },
+    {
+      "name": "Mike",
+      "email": "mike@company.com",
+      "role": "Reviewer",
+      "lastActive": "2 days ago",
+      "status": "active",
+      "departments": "Marketing"
+    }
+]
+

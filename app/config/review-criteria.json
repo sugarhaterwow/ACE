@@ -1,0 +1,38 @@
+{
+  "title": "Default Review Criteria Settings",
+  "subtitle": "",
+  "queryItems": {
+    "title": "Select Checklist",
+    "placeholder": "Select a checklist",
+    "options": [
+      { "label": "Construction Checklist", "value": "construction" }
+    ]
+  },
+  "tableColumns": [
+    {
+      "title": "Item",
+      "key": "item",
+      "align": "center",
+      "ellipsis": true
+    },
+    {
+      "title": "Search Entities",
+      "key": "search_entities",
+      "align": "center",
+      "type": "tag"
+    },
+    {
+      "title": "Analysis Type",
+      "key": "analysis_type",
+      "align": "center",
+      "ellipsis": true
+    },
+    {
+      "title": "Actions",
+      "key": "actions",
+      "align": "center",
+      "type": "button",
+      "label": "Delete"
+    }
+  ]
+}

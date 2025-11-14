@@ -1,0 +1,118 @@
+{
+  "steps": [
+    {
+      "title": "Analysis Checklist",
+      "description": "Select the item you want the systems to analyse in your tender document.",
+      "modules": [
+        {
+          "title": "",
+          "components": [
+            {
+              "type": "select",
+              "label": "Select Checklist",
+              "required": true,
+              "placeholder": "Select a Checklist",
+              "options": [
+                { "label": "Construction Checklist", "value": "Construction Checklist" }
+              ]
+            },
+            {
+              "type": "select",
+              "label": "Select Criteria Profile",
+              "required": true,
+              "placeholder": "Select a Criteria Profile",
+              "options": [
+                { "label": "Singapore", "value": "Singapore" },
+                { "label": "Hong Kong", "value": "Hong Kong" }
+              ]
+            }
+          ]
+        }
+      ],
+      "tableColumns": [
+        { "type": "selection", "width": 60, "align": "center" },
+        { "title": "Item", "key": "item", "align": "center", "ellipsis": { "tooltip": true } },
+        { "title": "Search Entities", "key": "search_entities", "align": "center", "customRender": true },
+        { "title": "Analysis Type", "key": "analysis_type", "align": "center", "ellipsis": { "tooltip": true } }
+      ]
+    },
+    {
+      "title": "Variable Criteria",
+      "description": "Set specific requirements for items that have compliance criteria. These can vary by project scenarios.",
+      "modules": [
+        {
+          "title": "Installation Period Requirements",
+          "components": [
+            {
+              "type": "input",
+              "label": "Minimum Period",
+              "required": true,
+              "placeholder": "e.g. 3 weeks"
+            },
+            {
+              "type": "select",
+              "label": "Units",
+              "required": true,
+              "placeholder": "Select unit",
+              "options": [
+                { "label": "Days", "value": "Days" },
+                { "label": "Weeks", "value": "Weeks" },
+                { "label": "Months", "value": "Months" }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Liability Limits",
+          "components": [
+            {
+              "type": "input",
+              "label": "Maximum Liability",
+              "required": false,
+              "placeholder": "e.g. 100"
+            },
+            {
+              "type": "input",
+              "label": "Insurance Minimum",
+              "required": true,
+              "placeholder": "e.g. $1 M USD"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Exemption Lists",
+      "description": "Set predefined exemptions that affect the analysis of each issue.",
+      "modules": [
+        {
+          "title": "",
+          "components": [
+            {
+              "type": "select",
+              "label": "Project Type",
+              "required": true,
+              "placeholder": "Select project type",
+              "options": [
+                { "label": "Standard Commercial", "value": "Standard Commercial" },
+                { "label": "Residential", "value": "Residential" },
+                { "label": "Industrial", "value": "Industrial" }
+              ]
+            },
+            {
+              "type": "select",
+              "label": "Region",
+              "required": true,
+              "placeholder": "Select region",
+              "options": [
+                { "label": "Europe", "value": "Europe" },
+                { "label": "Asia", "value": "Asia" },
+                { "label": "North America", "value": "North America" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

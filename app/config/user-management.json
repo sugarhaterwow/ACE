@@ -1,0 +1,101 @@
+{
+    "title": "User Management & Access Control",
+    "subtitle": "",
+    "tabs": [
+        {
+            "name": "users",
+            "label": "Users",
+            "component": "Users",
+            "config": {
+                "title": "User Management",
+                "filters": [
+                    {
+                        "title": "Roles",
+                        "type": "select",
+                        "key": "role",
+                        "label": "Role",
+                        "placeholder": "All Roles",
+                        "options": [
+                            { "label": "Admin", "value": "Admin" },
+                            { "label": "Reviewer", "value": "Reviewer" },
+                            { "label": "Viewer", "value": "Viewer" }
+                        ]
+                    },
+                    {
+                        "title": "Departments",
+                        "type": "select",
+                        "key": "departments",
+                        "label": "Departments",
+                        "placeholder": "All Departments",
+                        "options": [
+                            { "label": "Engineering", "value": "Engineering" },
+                            { "label": "Marketing", "value": "Marketing" },
+                            { "label": "Sales", "value": "Sales" }
+                        ]
+                    },
+                    {
+                        "title": "Statuses",
+                        "type": "select",
+                        "key": "status",
+                        "label": "Status",
+                        "placeholder": "All Statuses",
+                        "options": [
+                            { "label": "Active", "value": "active" },
+                            { "label": "Inactive", "value": "inactive" }
+                        ]
+                    },
+                    {
+                        "title": "Search Users...",
+                        "type": "input",
+                        "key": "keyword",
+                        "label": "Keyword",
+                        "placeholder": "Search Users..."
+                    }
+                ],
+                "tableColumns": [
+                      {
+                        "title": "Name & Email",
+                        "key": "name",
+                        "align": "left",
+                        "type": "custom",
+                        "render": "nameEmail"
+                      },
+                      {
+                        "title": "Role",
+                        "key": "role",
+                        "align": "center"
+                      },
+                      {
+                        "title": "Last Active",
+                        "key": "lastActive",
+                        "align": "center"
+                      },
+                      {
+                        "title": "Status",
+                        "key": "status",
+                        "align": "center",
+                        "type": "switch"
+                      },
+                      {
+                        "title": "Actions",
+                        "key": "actions",
+                        "align": "center",
+                        "type": "dropdown",
+                        "options": [
+                          { "label": "Edit", "key": "edit" },
+                          { "label": "Remove", "key": "remove" }
+                        ]
+                      }
+                    ]
+            }
+        },
+        {
+            "name": "roles_permissions",
+            "label": "Roles & Permissions",
+            "component": "RolesPermissions",
+            "config": {
+                "title": "Roles & Permissions"
+            }
+        }
+    ]
+}

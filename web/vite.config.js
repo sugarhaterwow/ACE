@@ -19,7 +19,7 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '~': rootPath,
-        '@': srcPath,
+        '@': srcPath
       },
     },
     define: viteDefine,

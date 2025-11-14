@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "http-proxy-node16": "^1.0.6"
+  },
+  "dependencies": {
+    "@vicons/fluent": "^0.13.0",
+    "@vicons/ionicons5": "^0.13.0",
+    "@vicons/material": "^0.13.0",
+    "pdfjs-dist": "^5.4.149",
+    "pinia": "^3.0.3",
+    "qs": "^6.14.0",
+    "vue-pdf": "^4.3.0",
+    "vue-pdf-embed": "^2.1.3"
+  }
+}

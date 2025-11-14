@@ -1,0 +1,24 @@
+{
+  "title": "Create a Tender Review Job",
+  "submitText": "Submit Job",
+  "steps": [
+    {
+      "title": "Document Upload",
+      "component": "Upload"
+    },
+    {
+      "title": "Review Profile",
+      "component": "ReviewProfile"
+    },
+    {
+      "title": "Edit Submit",
+      "component": "EditSubmit"
+    }
+  ],
+  "messages": {
+    "unsavedChanges": "You have unsaved changes on this page. Please save before continuing.",
+    "noChangesDetected": "There are no new changes on this page. Do you want to continue?",
+    "saveSuccess": "Saved successfully!",
+    "saveFailed": "Save failed!"
+  }
+}

@@ -959,7 +959,7 @@ wheels = [
 ]
 
 [[package]]
-name = "vue-fastapi-admin"
+name = "tender-review"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

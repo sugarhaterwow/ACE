@@ -2,8 +2,8 @@ import { isNullOrUndef } from '@/utils'
 
 class Storage {
   constructor(option) {
-    this.storage = option.storage
-    this.prefixKey = option.prefixKey
+    this.storage = option.storage // 传入的存储对象，可以是 `sessionStorage` 或 `localStorage`
+    this.prefixKey = option.prefixKey // 用于前缀化存储的 key，以防止 key 冲突
   }
 
   getKey(key) {
@@ -16,7 +16,7 @@ class Storage {
       time: Date.now(),
       expire: !isNullOrUndef(expire) ? new Date().getTime() + expire * 1000 : null,
     })
-    this.storage.setItem(this.getKey(key), stringData)
+    this.storage.setItem(this.getKey(key), stringData) // 将数据存入 localStorage 或 sessionStorage，存储的键是 getKey(key) 生成的带前缀的键
   }
 
   get(key) {

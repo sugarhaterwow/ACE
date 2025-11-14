@@ -1,11 +1,11 @@
 {
   "lang": "English",
-  "app_name": "Vue FastAPI Admin",
+  "app_name": "ACE",
   "header": {
     "label_profile": "Profile",
     "label_logout": "Logout",
     "label_logout_dialog_title": "Hint",
-    "text_logout_confirm": "Logout confirm",
+    "text_logout_confirm": "Logout confirm?",
     "text_logout_success": "Logout success"
   },
   "views": {
@@ -16,14 +16,15 @@
       "message_login_success": "Login successful"
     },
     "workbench": {
-      "label_workbench": "Workbench",
-      "text_hello": "hello, {username}",
-      "text_welcome": "Today is another day full of energy!",
-      "label_number_of_items": "Number of items",
-      "label_upcoming": "Upcoming",
-      "label_information": "Information",
-      "label_project": "Project",
-      "label_more": "More"
+      "label_application": "Application",
+      "label_dashboard": "Dashboard",
+      "label_tender_review": "Tender Review",
+      "label_contract_review": "Contract Review",
+      "label_search_document": "Search Document",
+      "label_clause_recommender": "Clause Recommender",
+      "label_default_review_criteria": "Default Review Criteria",
+      "label_review_profile": "Review Profile",
+      "label_user_management": "User Management"
     },
     "profile": {
       "label_profile": "Profile",

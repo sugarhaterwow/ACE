@@ -1,0 +1,68 @@
+{
+  "title": "Criteria Profile Management",
+  "subtitle": "",
+  "tableTitle": "Selected Issues and Checked Items",
+  "queryItems": {
+    "title": "Select Checklist",
+    "placeholder": "Select a criteria profile",
+    "options": [
+      { "label": "Hong Kong", "value": "Hong Kong" },
+      { "label": "Singapore", "value": "Singapore" }
+    ]
+  },
+  "tableColumns": [
+      {
+        "type": "selection",
+        "width": 60,
+        "align": "center"
+      },
+      {
+        "title": "ID",
+        "key": "id",
+        "align": "center",
+        "ellipsis": true
+      },
+      {
+        "title": "Item",
+        "key": "item",
+        "align": "center",
+        "ellipsis": true
+      },
+      {
+        "title": "Search Entities",
+        "key": "search_entities",
+        "align": "center",
+        "ellipsis": true
+      },
+      {
+        "title": "Analysis Type",
+        "key": "analysis_type",
+        "align": "center",
+        "ellipsis": true
+      }
+    ],
+    "createItems": {
+      "title": "Create Criteria Profile"
+    },
+    "modules": [
+      {
+        "title": "Criteria Profile Name",
+        "description": "Give this criteria profile a clear name",
+        "components": [
+          {
+            "type": "select",
+            "label": "Profile Name",
+            "required": true,
+            "placeholder": "Criteria Profile",
+            "options": [
+                { "label": "Singapore", "value": "Singapore" },
+                { "label": "Hong Kong", "value": "Hong Kong" },
+                { "label": "+ New", "value": "new" }   
+            ]
+          }
+        ]
+      }
+      
+    ]
+        
+}
