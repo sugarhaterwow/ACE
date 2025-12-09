@@ -62,22 +62,26 @@ class HttpAuditLogMiddleware(BaseHTTPMiddleware):
 
         # 获取请求体
         if request.method in ["POST", "PUT", "PATCH"]:
+            # 缓存请求体，避免后续路由拿不到
+            body_bytes = await request.body()
+            request._body = body_bytes  # 关键改动：把原始字节放回 request
+
+            content_type = request.headers.get("content-type", "")
             try:
-                body = await request.json()
-                args.update(body)
-            except json.JSONDecodeError:
-                try:
-                    body = await request.form()
-                    # args.update(body)
-                    for k, v in body.items():
+                if content_type.startswith("application/json"):
+                    body = json.loads(body_bytes.decode("utf-8"))
+                    args.update(body)
+                elif content_type.startswith("multipart/form-data"):
+                    form = await request.form()
+                    for k, v in form.items():
                         if hasattr(v, "filename"):  # 文件上传行为
                             args[k] = v.filename
                         elif isinstance(v, list) and v and hasattr(v[0], "filename"):
                             args[k] = [file.filename for file in v]
                         else:
                             args[k] = v
-                except Exception:
-                    pass
+            except Exception:
+                pass
 
         return args
 

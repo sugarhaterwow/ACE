@@ -1,4 +1,5 @@
-[
+{
+  "checklist": [
     {
       "id": 1,
       "item": "Customer Information",
@@ -25,19 +26,21 @@
     },
     {
       "id": 4,
-      "item": "Liability Terms",
-      "search_entities": ["Liability Limits", "Insurance Requirements"],
-      "removed_entities": [],
-      "analysis_type": "Search & Highlight",
-      "selected": true
-    },
-    {
-      "id": 5,
       "item": "Payment Terms",
       "search_entities": ["Payment Schedule", "Currency", "Tax Obligations"],
       "removed_entities": [],
       "analysis_type": "Search & Highlight",
       "selected": true
     }
-  ]
-  
+  ],
+  "variable_criteria": {
+      "minimum_period": "3 weeks",
+      "units": "Weeks",
+      "maximum_liability": "100",
+      "insurance_minimum": "$1 M USD"
+  },
+  "exemption_lists": {
+      "project_type": "Standard Commercial",
+      "regional": "Europe"
+  }
+} 

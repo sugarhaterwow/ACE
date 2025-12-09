@@ -3,6 +3,10 @@
   "submitText": "Submit Job",
   "steps": [
     {
+      "title": "Project Creation",
+      "component": "BasicInfo"
+    },
+    {
       "title": "Document Upload",
       "component": "Upload"
     },

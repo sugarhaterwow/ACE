@@ -13,27 +13,19 @@ export default {
   // config
   getPageConfig: (page) => request.get(`/configs/${page}`),
   // dashboard
-  getDashboardData: (params = {}) => request.get('/dashboard/list', { params}),
+  getDashboardData: (params = {}) => request.get('/dashboard/list', {params}),
   // tender-review
-  uploadFiles: (formData) => request.post(
-    '/tender-review/upload', 
-    formData, 
-    { headers: { 'Content-Type': 'multipart/form-data' } }
-  ),
-
-  deleteFile: (data) => {
-    const fd = new FormData()
-    fd.append('filename', data.filename)
-    fd.append('folder', data.folder)
-    return request.post('/tender-review/delete', fd)
-  },
+  createProject: (data) => request.post('/tender-review/job', data),
+  deleteProject: (name) => request.delete(`/tender-review/job/${name}`),
+  uploadFiles: (formData) => request.post('/tender-review/upload', formData),
+  deleteFile: (folder, filename) => request.delete(`/tender-review/${folder}/${filename}`),
   getChecklist: (params = {}) =>
     request.get('/tender-review/analysis-checklist', {
       params,
       paramsSerializer: (p) => qs.stringify(p, { arrayFormat: 'repeat' })
   }),
-  submitTenderReview: (data) => request.post('/tender-review/submit-review', data),
-
+  saveConfig: (data) => request.put('/tender-review/update-config', data),
+  submitJob: (data) => request.put('/tender-review/submit-config', data),
 
   // search-document
   searchDocument: (params = {}) => request.get(`/search-document`, { params }),

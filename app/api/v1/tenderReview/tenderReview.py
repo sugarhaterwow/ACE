@@ -1,16 +1,16 @@
 import logging
 
-from fastapi import APIRouter, Query, HTTPException, UploadFile, File, Form, Request, Path
+from fastapi import APIRouter, Query, UploadFile, File, Form, Body
 from app.core.dependency import DependAuth
-from app.models import User
-from typing import List
-from typing import Optional
+from typing import List, Optional, Dict
 from tortoise.expressions import Q
 # from app.controllers.tender import tender_controller 
 from app.schemas.base import Success, Fail, SuccessExtra
 from app.schemas.menus import *
-import os, json
+import os, json, shutil
 from app.settings.config import settings
+from pydantic import BaseModel
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -80,47 +80,118 @@ router = APIRouter()
 #     }
 
 
-@router.post("/upload")
-async def upload_files(files: List[UploadFile] = File(...), folder: str = Form("Default")):
-    folder_path = Path(settings.UPLOAD_ROOT) / folder
-    folder_path.mkdir(parents=True, exist_ok=True)
+# 定义请求体数据模型
+class ProjectCreateRequest(BaseModel):
+    job_name: str
 
-    uploaded_names = []
+
+# 定义接收到的请求数据结构
+class ChecklistItem(BaseModel):
+    id: int
+    item: str
+    search_entities: list
+    removed_entities: list
+    analysis_type: str
+    selected: bool
+
+class ConfigUpdateRequest(BaseModel):
+    Analysis_Checklist: Dict[str, list]
+    Variable_Criteria: Dict[str, str]
+    Exemption_Lists: Dict[str, str]
+
+@router.post("/job")
+def create_job(request: ProjectCreateRequest):
+    
+    job_name = request.job_name  # 获取请求体中的 job_name
+    print("upload:", job_name)
+    job_path = Path(settings.UPLOAD_ROOT) / job_name
+    # 检查是否存在
+    if os.path.exists(job_path):
+        return Fail(code=409, msg="Project already exists!")
+    try:
+        os.makedirs(job_path)
+        
+
+        return Success(code=200, msg="Project created successfully!", data={"name": job_name})
+    except Exception as e:
+        return Fail(code=500, msg=f"Failed to create project: {str(e)}")
+
+
+@router.delete("/job/{job_name}")
+def delete_job(job_name: str):
+
+    job_path = Path(settings.UPLOAD_ROOT) / job_name
+
+    if not os.path.exists(job_path):
+        return Fail(code=404, msg="Project not found")
+
+    try:
+        shutil.rmtree(job_path)
+        return Success(code=204, msg="Job deleted")
+    except Exception as e:
+        return Fail(code=500, msg=f"Failed to delete project: {str(e)}")
+
+
+
+@router.post("/upload")
+async def upload_files(
+    folder: str = Form(...),
+    files: List[UploadFile] = File(...)
+):
+    print("收到的 folder:", folder)
+
+    for f in files:
+        print("文件名:", f.filename)
+        print("文件类型:", f.content_type)
+        content = await f.read()
+        print("文件大小:", len(content), "字节")
+    folder_path = Path(settings.UPLOAD_ROOT) / folder
+    os.makedirs(folder_path, exist_ok=True)
+
+    success_files = []
+    failed_files = []
 
     for file in files:
-        filename = Path(file.filename).name
-        file_path = folder_path / filename
-        with open(file_path, "wb") as f:
-            while content := await file.read(1024*1024):
-                f.write(content)
-        uploaded_names.append(filename)
+        try:
+            file_path = folder_path / file.filename
+            with open(file_path, "wb") as f:
+                f.write(await file.read())
+            success_files.append(file.filename)
+        except Exception as e:
+            failed_files.append({"filename": file.filename, "error": str(e)})
 
-    return {"success": True, "uploaded": uploaded_names}
+    # 返回成功和失败的详细情况
+    if failed_files:
+        return Success(
+            code=200,  # 207 Multi-Status 表示部分成功
+            msg="Some files failed to upload!",
+            data={"success": success_files, "failed": failed_files}
+        )
+    else:
+        return Success(
+            code=200,
+            msg="All files uploaded successfully!",
+            data={"success": success_files, "failed": failed_files}
+        )
 
-
-@router.post("/delete")
-async def delete_file(filename: str = Form(...), folder: str = Form("Default")):
+@router.delete("/{folder}/{filename}")
+def delete_file(folder: str, filename: str):
+    file_path = Path(settings.UPLOAD_ROOT) / folder / filename
+    if not os.path.exists(file_path):
+        return Fail(code=404, msg="File not found!")
     try:
-        file_path = os.path.join(settings.UPLOAD_ROOT, filename)
-
-        if os.path.exists(file_path):
-            os.remove(file_path)
-            return Success(msg=f"{filename} deleted.")
-        else:
-            return Success(msg="File not found.", status_code=404)
+        os.remove(file_path)
+        return Success(code=200, msg=f"File {filename} deleted successfully!", data={"folder": folder, "filename": filename})
     except Exception as e:
-        return Success(msg="File deletion failed.", data={"error": str(e)})
+        return Fail(code=500, msg=f"Failed to delete file: {str(e)}")
 
 
 @router.get("/analysis-checklist", summary="查看投标书列表")
 async def list_tender(
     values: List[str] = Query(...),
-    page: int = Query(1, gt=0, description="页码"),
-    page_size: int = Query(0, ge=0, description="每页数量，0 表示返回全部")
 ):
     if not values:
         return Fail(code=400, msg="values parameter cannot be empty", data=[])
-    
     
     filename = f"{''.join(values[-1].lower().split())}.json"
     file_path = os.path.join(settings.CHECKLIST_ROOT, filename)
@@ -133,29 +204,103 @@ async def list_tender(
         checklist_data = json.load(f)
     print(checklist_data)
     total = len(checklist_data)
+    print("total:", total)
+    return Success(code=200, msg="Loaded Successfully", data=checklist_data)
 
-    # 如果 page_size=0 → 返回全部
-    if page_size == 0:
-        return SuccessExtra(msg="Loaded Successfully", data=checklist_data, total=total, page=1, page_size=total)
+@router.put("/update-config", summary="提交投标书配")
+async def update_config(config_update: dict = Body(...)):
+    print("Received config update:", config_update)
+     # 直接访问整个请求体数据
+    Analysis_Checklist = config_update.get("Analysis Checklist")
+    Variable_Criteria = config_update.get("Variable Criteria")
+    Exemption_Lists = config_update.get("Exemption Lists")
+    
+    for checklist_key, checklist_value in Analysis_Checklist.items():
+        if checklist_key and len(checklist_value) > 0:
+            parsedValues = checklist_key.split('::')
+            filename = f"{''.join(parsedValues[-1].lower().split())}.json"
+            file_path = os.path.join(settings.CHECKLIST_ROOT, filename)
+            
+             # 读取原有的 JSON 数据
+            with open(file_path, "r", encoding="utf-8") as f:
+                original_data = json.load(f)
+            
+            # 更新 checklist_value 中的数据
+            for item in checklist_value:
+                item_id = item.get("id")
 
-    # 否则分页
-    start = (page - 1) * page_size
-    end = start + page_size
-    paged_data = checklist_data[start:end]
+                # 找到原 JSON 中对应 id 的项
+                original_item = next((x for x in original_data if x.get("id") == item_id), None)
 
-    return SuccessExtra(msg="Loaded Successfully", data=paged_data, total=total, page=page, page_size=page_size)
+                if original_item:
+                    # 如果 selected 为 False，不覆盖原有数据，但将 selected 修改为 False
+                    if item.get("selected") is False:
+                        original_item["selected"] = False
+                    else:
+                        # 如果 selected 为 True，则完全覆盖原数据
+                        original_item.update(item)
 
+    for criteria_key, criteria_value in Variable_Criteria.items():
+        file_path = os.path.join(settings.CONFIGS_ROOT, "review-profile.json")
 
-@router.post("/submit-analysis", summary="提交投标书配置")
-async def submit_analysis(payload: dict):
-    # 遍历 payload 的每个 key:value
-    for key, value in payload.items():
-        if value in (None, "", []):
-            return Fail(
-                code=400,
-                msg=f"Field '{key}' cannot be empty",
-                data=payload
-            )
+        # 读取配置文件
+        with open(file_path, "r", encoding="utf-8") as f:
+            review_profile = json.load(f)
+
+        step = next((s for s in review_profile.get("steps", []) if s["title"] == "Variable Criteria"), None)
+        print("step:", step)
+        
+        # 遍历 review_profile 的 steps，找到对应的 title
+        for module in step.get("modules", []):
+            print("Module Title:", module["title"], "Criteria Key:", criteria_key)
+            
+            # 找到对应的步骤和模块 
+            for comp in module.get("components", []):
+                
+                # 找到对应的步骤和模块
+                if comp["label"] == criteria_key:  # 如果 label 匹配
+                    # 更新 value
+                    print("Updating", criteria_value, comp)
+                    comp["value"] = criteria_value
+        
+        # 保存更新后的配置文件
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(review_profile, f, ensure_ascii=False, indent=4)
+
+    for exemption_key, exemption_value in Exemption_Lists.items():
+        # 获取配置文件路径
+        file_path = os.path.join(settings.CONFIGS_ROOT, "review-profile.json")
+
+        # 读取配置文件
+        with open(file_path, "r", encoding="utf-8") as f:
+            review_profile = json.load(f)
+
+        step = next((s for s in review_profile.get("steps", []) if s["title"] == "Exemption Lists"), None)
+        
+        # 遍历 review_profile 的 steps，找到对应的 title
+        for module in step.get("modules", []):
+
+                # 找到对应的步骤和模块 
+            for comp in module.get("components", []):
+                
+                # 找到对应的步骤和模块
+                if comp["label"] == exemption_key:  # 如果 label 匹配
+                    # 更新 value
+                    print("Updating", exemption_value, comp)
+                    comp["value"] = exemption_value
+
+        # 保存更新后的配置文件
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(review_profile, f, ensure_ascii=False, indent=4)
 
     # 如果所有字段都不为空，直接返回成功
-    return Success(code=200, msg="Submitted successfully", data=payload)
+    return Success(code=200, msg="Submitted successfully", data=config_update)
+
+@router.put("/submit-config", summary="提交投标书配")
+async def submit_config(config_update: dict = Body(...)):
+    # 检查所有字段是否都不为空
+    # if not config_update.get("Analysis_Checklist") or not config_update.get("Variable_Criteria") or not config_update.get("Exemption_Lists"):
+    #     return Fail(code=400, msg="All configuration sections must be provided and non-empty.", data=None)
+    
+    # 如果所有字段都不为空，直接返回成功
+    return Success(code=200, msg="Submitted successfully", data=config_update)

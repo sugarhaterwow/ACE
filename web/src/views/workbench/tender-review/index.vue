@@ -1,6 +1,3 @@
-
-
-
 <template>
   <AppPage title="Create a Tender Review job" show-footer>
   
@@ -50,262 +47,220 @@
 
 <script setup lang="ts">
 
-import { h, ref, onMounted } from 'vue'
+import { h, ref, onMounted, onBeforeUnmount } from 'vue'
 import { NButton, useDialog, useMessage, useNotification } from 'naive-ui'
-import { useRouter } from 'vue-router'
 
+import ProjectSetup from './ProjectSetup.vue'
 import Upload from './Upload.vue'
 import ReviewProfile from './ReviewProfile.vue'
-
 import EditSubmit from './EditSubmit/index.vue'
+import api from '@/api'
+import { onBeforeRouteLeave } from 'vue-router'
 
-import { useStepStore } from '@/store/modules/step'
+
+onMounted(() => {
+  window.addEventListener('beforeunload', handleBeforeUnload)
+})
+
+
+onBeforeUnmount(() => {
+  window.removeEventListener('beforeunload', handleBeforeUnload)
+})
+
+function handleBeforeUnload(e: BeforeUnloadEvent) {
+  // 如果有未保存的修改，就提示
+  if (1) {
+    e.preventDefault()
+    e.returnValue = ''   // Chrome/Firefox 必须设置 returnValue 才会触发提示
+  }
+}
+
+
+
+onBeforeRouteLeave((to, from, next) => {
+  if (1) {
+    // 有未保存修改 → 弹窗确认
+    dialog.warning({
+      title: 'Unsaved changes',
+      content: 'You have unsaved changes. Are you sure you want to leave?',
+      positiveText: 'Leave',
+      negativeText: 'Stay',
+      onPositiveClick: () => {
+        // 用户点击“离开” → 执行函数
+        api.deleteProject(projectName.value)
+        next()
+      },
+      onNegativeClick: () => next(false) // 取消跳转
+    })
+  } else {
+    next()
+  }
+})
+
 
 const dialog = useDialog()
 const message = useMessage()
 const notification = useNotification()
 
-const stepCount = 3
+// 总步骤数
+const stepCount = 4
+// 初始步骤：第一步
 const currentStep = ref(0)
-const hasSuccess = ref(false)
-
-
-const router = useRouter()
-
-
-// 每个步骤的“是否保存过”标记
-const everSavedArr = ref<boolean[]>(Array(stepCount).fill(false))
-
-// 每次进入新页面时，重置该步骤的保存标记
-watch(currentStep, (newStep) => {
-  everSavedArr.value[newStep] = false
+// 保存每一次独立job的任务名
+const projectName = ref<string>('')
+// 保存上传步骤的文件
+const uploadFile = ref<File | null>(null)
+// 第一步和第二步出现Next Page按钮的标志
+const stepSuccess = ref({
+  projectSetup: false,
+  upload: false,
 })
+// 第三步的子组件实例
+const reviewProfileRef = ref()
 
-// 使用 Pinia store
-const stepStore = useStepStore()
 
-// 页面加载时恢复
-onMounted(() => {
-  stepStore.loadFromLocal()
-})
 
-const stepRefs = ref<any[]>([])
-// 深比较函数
-const deepEqual = (a: any, b: any) => JSON.stringify(a) === JSON.stringify(b)
-
+// 回到前一步骤
 const goPrev = () => {
   if (currentStep.value > 0) currentStep.value -= 1
 }
+// 前往下一步骤
 const goNext = () => {
   if (currentStep.value < steps.length - 1) currentStep.value += 1
 }
 
-const tempForms = ref<Record<number, StepForm>>({})
 
 const prevPage = () => {
   if (currentStep.value === 0) return // 已经是第一页了
 
   const idx = currentStep.value
-  const state = stepStore.stepStates[idx]
-  const comp = stepRefs.value[idx]
-
-  // 1. 获取子组件当前临时态
-  const tempForm = comp?.getTempForm ? comp.getTempForm() : state.form
-
-  if (!everSavedArr.value[idx]) {
-    
-    // 2. 对比临时态和已保存快照
-    const hasDiff = !deepEqual(tempForm, state.form)
-    state.updated = hasDiff
-    if (hasDiff) state.saved = false
-
-  }
-
-  // 3. 校验必填项
-  if (comp && typeof comp.validate === 'function') {
-    const valid = comp.validate()
-    if (!valid) return
-  }
-
-  console.log(state.updated, state.saved)
-
-  // 4. 如果有改动但未保存 → 提示用户
-  if (!state.saved && state.updated) {
-    // 有未保存的改动 → 必须保存
-    dialog.warning({
-      title: 'Unsaved changes',
-      content: 'You have unsaved changes on this page. Please save before continuing.',
-      positiveText: 'Save',
-      onPositiveClick: () => {
-        const ok = stepStore.saveStep(idx, tempForm)
-        if (ok) {
-          message.success('Saved successfully!')
-          goPrev()
-        } else {
-          message.error('Save failed!')
-        }
-      }
-    })
-    return
-  }
-
-  if (!state.saved && !state.updated) {
-    // 没有改动 → 可以直接继续
-    dialog.warning({
-        title: 'No changes detected',
-        content: 'There are no new changes on this page. Do you want to continue?',
-        positiveText: 'Continue',
-        negativeText: 'Cancel',
-        onPositiveClick: () => {
-          goPrev()
-        }
-    })
-    return
-  }
-
-  if (state.saved && !state.updated) {
-    // 已保存且没有新改动 → 直接继续
-    dialog.warning({
-        title: 'No changes detected',
-        content: 'There are no new changes on this page. Do you want to continue?',
-        positiveText: 'Continue',
-        negativeText: 'Cancel',
-        onPositiveClick: () => {
-          goPrev()
-        }
-    })
-    return
-  }
-
-  if (state.saved && state.updated) {
-    // 已保存且有新改动 → 直接继续
-    goPrev()
-    return
-  }
-
+  goPrev()
 }
 
 const nextPage = () => {
-  if (currentStep.value === 0) { 
-    goNext() 
+  if (currentStep.value === 2) { 
     return 
   }
   const idx = currentStep.value
-  const state = stepStore.stepStates[idx]
-  const comp = stepRefs.value[idx]
-  // 1. 从子组件拿当前临时态（子组件需 defineExpose({ getTempForm })
-  const tempForm = comp?.getTempForm ? comp.getTempForm() : state.form
-
-  if (!everSavedArr.value[idx]) {
-    
-    // 2. 对比临时态和已保存快照
-    const hasDiff = !deepEqual(tempForm, state.form)
-    state.updated = hasDiff
-    if (hasDiff) state.saved = false
-
-  }
-
   
-  // 3. 校验必填项
-      if (comp && typeof comp.validate === 'function') {
-        const valid = comp.validate()
-        if (!valid) return
-      }
-  console.log("updated:",state.updated, "saved:", state.saved)
-  console.log("现在填写的内容", JSON.stringify(tempForm), "父组件保存的内容", JSON.stringify(state.form))
-
-
-  // 4. 判断保存状态
-  if (!state.saved && state.updated) {
-    // 有未保存的改动 → 必须保存
-    dialog.warning({
-      title: 'Unsaved changes',
-      content: 'You have unsaved changes on this page. Please save before continuing.',
-      positiveText: 'Save',
-      onPositiveClick: () => {
-        const ok = stepStore.saveStep(idx, tempForm)
-        if (ok) {
-          message.success('Saved successfully!')
-          goNext()
-        } else {
-          message.error('Save failed!')
-        }
-      }
-    })
-    return
-  }
-
-  if (!state.saved && !state.updated) {
-    // 没有改动 → 可以直接继续
-    dialog.warning({
-        title: 'No changes detected',
-        content: 'There are no new changes on this page. Do you want to continue?',
-        positiveText: 'Continue',
-        negativeText: 'Cancel',
-        onPositiveClick: () => {
-          goNext()
-        }
-    })
-    return
-  }
-
-  if (state.saved && !state.updated) {
-    // 已保存且没有新改动 → 直接继续
-    dialog.warning({
-        title: 'No changes detected',
-        content: 'There are no new changes on this page. Do you want to continue?',
-        positiveText: 'Continue',
-        negativeText: 'Cancel',
-        onPositiveClick: () => {
-          goNext()
-        }
-    })
-    return
-  }
-  if (state.saved && state.updated) {
-    // 已保存且有新改动 → 直接继续
-    goNext()
-    return
-  }
+  // 已保存且有新改动 → 直接继续
+  goNext()
+    
 }
 
+// 最后一步统一提交：
+// 情况 1：初始为空 + 没修改 → 提示 "No changes made on this page. Please fill in required fields before submitting."
+// 情况 2：没修改 + 必填项都有值 → 弹窗确认 "No changes made. Submit already saved configuration?"
+// 情况 3：修改了但没保存 → 弹窗确认 "You have unsaved changes. Proceed without saving current configuration?"
+// 情况 4：修改并保存过 → 直接提交后端已保存的配置。
 
-// 最后一步统一提交
+
 const submitAll = () => {
-  const needCheckSteps = [1]
+  const comp = reviewProfileRef.value
+  console.log(comp)
+  if (!comp) return
+  const tempForm = comp.getTempForm()
+  const isModified = comp.isModified //是否修改
+  const hasRequired = comp.validate() // 所有必填项都填写
+  const hasSaved = comp.hasSaved // 是否保存
+  console.log("修改：", isModified, "必填：", hasRequired, "保存：", hasSaved)
 
-  const notSavedSteps = needCheckSteps.filter(
-    idx => !stepStore.stepStates[idx].saved
-  )
-
-  if (notSavedSteps.length > 0) {
-    const titles = notSavedSteps.map(idx => steps[idx].title).join(', ')
-    message.warning(`The following steps are not saved: ${titles}`)
+  if (!hasRequired) {
+    // 情况 1
+    message.warning("Please fill in required fields before submitting.")
     return
   }
+  else {
+    if (!isModified) {
+      // 没修改没保存/没修改保存了：提示页面没变化，是否提交已保存的配置？
+      dialog.warning({
+        title: "No changes detected",
+        content: "No changes made on this page. Do you want to submit the already saved configuration?",
+        positiveText: "Confirm",
+        negativeText: "Cancel",
+        onPositiveClick: () => {
+          api.submitJob(tempForm)
+          message.success("Submitted successfully!")
+          goNext()
+        }
+      })
+      return
+    }
 
-  // 全部保存了，才允许提交
-  stepStore.submitAll()
-  message.success('Task submitted, processing started...')
-
- goNext() 
-
+        
+    if (!hasSaved && isModified) {
+      // 保存了没修改：提示页面没变化，是否提交已保存的配置？
+      dialog.warning({
+        title: "Unsaved changes",
+        content: "You have unsaved changes. Proceed without saving current configuration?",
+        positiveText: "Confirm",
+        negativeText: "Cancel",
+        onPositiveClick: () => {
+          api.submitJob(tempForm)
+          message.success("Submitted successfully!")
+          goNext()
+        }
+      })
+      return
+    }
+    
+    if (hasSaved && isModified) {
+      // 保存了并且有修改：直接提交
+      dialog.success({
+        title: "Ready to submit",
+        content: "You have saved and modified configuration. Submit now?",
+        positiveText: "Submit",
+        negativeText: "Cancel",
+        onPositiveClick: () => {
+          api.submitJob(tempForm)
+          message.success("Submitted successfully!")
+          goNext()
+        }
+      })
+      return
+    }
+  
+  }
 }
+
 
 // 步骤定义
 const steps = [
   {
-    title: 'Document Upload',
+    title: 'ProjectSetup',
     component: () =>
-      h(Upload, {
-        form: stepStore.stepStates[currentStep.value].form, // 固定第0步
-        hasSuccess: hasSuccess.value,
-        'onUpdate:hasSuccess': (v: boolean) => (hasSuccess.value = v)
+      h(ProjectSetup, {
+        projectName: projectName.value,
+        'onUpdate:projectName': (v: string) => (projectName.value = v),
+        hasSuccess: stepSuccess.value.projectSetup,
+        'onUpdate:hasSuccess': (v: boolean) => (stepSuccess.value.projectSetup = v)
       }),
     footer: () =>
       h('div', { style: 'display:flex;justify-content:space-between;padding:0 16px;' }, [
         h('div'),
-        hasSuccess.value
+        stepSuccess.value.projectSetup
+          ? h(NButton, { type: 'primary', ghost: true, onClick: nextPage }, { default: () => 'Next Page' })
+          : null
+      ])
+
+  },
+  {
+    title: 'Document Upload',
+    component: () =>
+      h(Upload, {
+        projectName: projectName.value,
+        file: uploadFile.value,
+        hasSuccess: stepSuccess.value.upload,
+        'onUpdate:file': (f: any) => (uploadFile.value = f),
+        'onUpdate:hasSuccess': (v: boolean) => {
+          console.log("upload button",v)
+          stepSuccess.value.upload = v
+          }
+      }),
+    footer: () =>
+      h('div', { style: 'display:flex;justify-content:space-between;padding:0 16px;' }, [
+        h('div'),
+        stepSuccess.value.upload
           ? h(NButton, { type: 'primary', ghost: true, onClick: nextPage }, { default: () => 'Next Page' })
           : null
       ])
@@ -314,17 +269,9 @@ const steps = [
     title: 'Review Profile',
     component: () =>
       h(ReviewProfile, {
-        ref: (el: any) => (stepRefs.value[currentStep.value] = el), 
-        form: stepStore.stepStates[currentStep.value].form, 
-        onSave: (v: StepForm) => {
-          const ok = stepStore.saveStep(currentStep.value, v)
-          if (ok) {
-            message.success('Saved successfully!')
-            everSavedArr.value[currentStep.value] = true
-          } else {
-            message.error('Save failed!')
-          }
-        }
+        ref: reviewProfileRef  // 父组件定义的 ref，用来拿子组件实例
+        // form: stepStore.stepStates[currentStep.value].form, 
+        
       }),
     footer: () =>
       h('div', { style: 'display: flex; justify-content: space-between; padding: 0 16px;' }, [
@@ -335,22 +282,11 @@ const steps = [
   {
     title: 'Edit Submit',
     component: () =>
-      h(EditSubmit, {
-        
-        
-        onSave: (v: StepForm) => {
-          const ok = stepStore.saveStep(currentStep.value, v)
-          if (ok) {
-            message.success('Saved successfully!')
-            everSavedArr.value[currentStep.value] = true
-          } else {
-            message.error('Save failed!')
-          }
-        }
-      })
+      h(EditSubmit)
   }
 ]
 
 
 </script>
 
+ 

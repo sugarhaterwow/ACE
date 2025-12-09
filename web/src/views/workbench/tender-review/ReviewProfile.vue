@@ -68,6 +68,7 @@
                     v-model:value="localForm[step.title][input.label]"
                     :placeholder="input.placeholder"
                     style="width: 280px"
+                    clearable
                   />
 
                   <n-select
@@ -76,6 +77,7 @@
                     :options="input.options"
                     :placeholder="input.placeholder"
                     style="width: 260px"
+                    clearable
                   />
                 </div>
               </div>
@@ -117,11 +119,12 @@ const innerTableData = ref<any[]>([])
 const checkedRowKeys = ref<number[]>([])
 const selectedTable = ref<any[]>([])
 
+const hasSaved = ref(false)        // 标记是否点击过 save 按钮（新增）
+// const isModified = ref(false)
 
-const props = defineProps<{
-  form?: Record<string, any>
-}>()
-const localForm = reactive<Record<string, any>>(JSON.parse(JSON.stringify(props.form || {})))
+const localForm = reactive<Record<string, any>>({})        // 当前用户填写的表单
+const originalForm = ref<Record<string, any>>({})          // 原始的表单快照
+
 
 // 子组件只负责收集数据，而 saved 和 updated 状态完全由父组件和 store 统一管理
 const emit = defineEmits<{
@@ -229,9 +232,11 @@ async function fetchTableData(...values: any[]) {
   // 格式化返回的数据，保证有 search_entities / removed_entities 字段
   const rows = res.data.map((item: any) => ({
     ...item,
-    removed_entities: [],
-    search_entities: item.search_entities || []
+    removed_entities: item.removed_entities,   // 保持接口原值
+    search_entities: item.search_entities,
+    selected: item.selected
   }))
+
 
   // 保存到内存表格数据
   innerTableData.value = rows
@@ -253,6 +258,7 @@ async function fetchTableData(...values: any[]) {
       if (match) {
         row.search_entities = [...match.search_entities]
         row.removed_entities = [...match.removed_entities]
+        row.selected = match.selected
       }
     })
   } else {
@@ -289,7 +295,7 @@ onMounted(async () => {
 
 
 
-  if (Object.keys(props.form).length === 0) {
+  
      // undefined | null | false | 0 | NaN | ''为true
     for (const [stepIndex, step] of pageConfig.value.steps.entries()) {
 
@@ -312,39 +318,59 @@ onMounted(async () => {
       } else {
           for (const mod of step.modules) {
             for (const comp of mod.components) {
-              localForm[step.title][comp.label] = null
+              localForm[step.title][comp.label] = comp.value
             }
           }
           
         }
     }
-  }
+  
   selectedTable.value = allCombos[0].map((opt: any) => opt.value)
+  originalForm.value = JSON.parse(JSON.stringify(localForm))
   
 
 })
 
+// 深对比两个对象是否一致（判断是否修改）
+const isFormEqual = (form1: Record<string, any>, form2: Record<string, any>): boolean => {
+  // 处理空对象/undefined 情况
+  if (!form1 && !form2) return true
+  if (!form1 || !form2) return false
+  // 处理数组引用不同但内容相同的情况（表格数据常用）
+  const stringify = (obj: any) => JSON.stringify(obj, (key, value) => {
+    if (Array.isArray(value)) return value.sort() // 数组排序后对比（避免顺序影响）
+    return value
+  })
+  return stringify(form1) === stringify(form2)
+}
 
 
 function handleSelectionChange(keys: number[]) {
-  
+  // 更新选中行 id
   checkedRowKeys.value = keys
-  const selected = innerTableData.value.filter(row => keys.includes(row.id))
+
   const key = getFormKey(...selectedTable.value)
-  console.log("在handleSelectionChange:", key)
   const stepTitle = pageConfig.value.steps[0].title
-  localForm[stepTitle][key] = selected
+
+  // 更新每一行的 selected 状态
+  innerTableData.value.forEach(row => {
+    row.selected = keys.includes(row.id)
+  })
+
+  // 保存完整的表格数据（包含选中和未选中行）
+  localForm[stepTitle][key] = [...innerTableData.value]
+
+  console.log("在handleSelectionChange:", key, localForm[stepTitle][key])
 }
+
 
 
 // 核心修改：在 onDataChange 时做回显
 const handleDataChange = (rows: any[]) => {
   innerTableData.value = rows
   const key = getFormKey(...selectedTable.value)
-  console.log("在handleDataChange:", key)
   const stepTitle = pageConfig.value.steps[0].title
   const saved = localForm[stepTitle][key]
-  console.log("saved:", saved)
 
   if (saved && saved.length) {
     // 回显行修改
@@ -353,17 +379,23 @@ const handleDataChange = (rows: any[]) => {
       if (match) {
         row.search_entities = [...match.search_entities]
         row.removed_entities = [...match.removed_entities]
+        row.selected = match.selected   // ✅ 恢复选中状态
       }
     })
 
     // 回显勾选状态
-    checkedRowKeys.value = saved.map(item => item.id)
+    checkedRowKeys.value = saved.filter(item => item.selected).map(item => item.id)
+  } else {
+    // 初始化勾选状态
+    checkedRowKeys.value = rows.filter(r => r.selected).map(r => r.id)
   }
 
-  // 保证 localForm 跟随更新
-  localForm[stepTitle][key] = rows.filter(r => checkedRowKeys.value.includes(r.id))
-  
+  // 保证 localForm 跟随更新（保存完整数据）
+  localForm[stepTitle][key] = [...rows]
+
+  console.log("在handleDataChange:", key, localForm[stepTitle][key])
 }
+
 
 
 // 修改 watch 中的调用
@@ -393,7 +425,7 @@ function validate(): boolean {
     if (step.tableColumns) {
       // 表格 step：至少有一个组合有选中行
       const hasAnySelection = Object.values(stepData).some(
-        (rows: any[]) => Array.isArray(rows) && rows.length > 0
+        (rows: any[]) => Array.isArray(rows) && rows.some(row => row.selected)
       )
       if (!hasAnySelection) {
         message.error(`Please select at least one item in ${step.title}!`)
@@ -415,17 +447,49 @@ function validate(): boolean {
   return true
 }
 
+const saveConfig = async () => {
+  // 校验表单
+  if (!validate()) return;  // 如果表单不通过校验，则不继续执行
+  
+  // 打印请求数据，检查是否缺少字段
+  console.log("准备发送的数据：", localForm);
 
-const saveConfig = () => {
-  console.log('Saving config:', localForm)
-  if (!validate()) return
-  emit('save', { ...localForm })   // 通知父组件保存
-}
+  try {
+    console.log("save:", localForm)
+    const response = await api.saveConfig(localForm);
+    
+    if (response && response.code === 200) {
+      // 如果保存成功，更新 originalForm
+      // originalForm.value = JSON.parse(JSON.stringify(localForm));  // 深拷贝 localForm 到 originalForm
+      hasSaved.value = true;
+      isModified.value = true
+      message.success("Configuration saved successfully!");
+    } else {
+      message.error("Failed to save configuration. Please try again.");
+    }
+  } catch (error) {
+    // 处理请求异常
+    message.error("An error occurred while saving the configuration. Please try again.");
+    console.error("Error saving configuration:", error);
+  }
+};
+
+const isModified = computed(() => !isFormEqual(localForm, originalForm.value))
+
+watch(localForm, () => {
+  hasSaved.value = false
+})
+
 
 // 暴露 validate 给父组件
 defineExpose({ 
   validate,
-  getTempForm: () => ({ ...localForm })
+  getTempForm: () => ({
+    ...localForm,
+    hasSaved: hasSaved.value   // ✅ 在返回对象里加上 hasSaved
+  }),
+  isModified: computed(() => isModified.value), // 暴露布尔值
+  hasSaved: computed(() => hasSaved.value)      // 暴露布尔值
 })
 
 

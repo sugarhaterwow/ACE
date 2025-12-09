@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     LOGS_ROOT: str = os.path.join(BASE_DIR, "app/logs")
     CONFIGS_ROOT: str = os.path.join(BASE_DIR, "app/config")
     DATA_ROOT: str = os.path.join(BASE_DIR, "Data/tenderReview/jsg")
-    UPLOAD_ROOT: str = os.path.join(DATA_ROOT, "Data/tenderReview/uploads")
+    UPLOAD_ROOT: str = os.path.join(BASE_DIR, "Uploads")
     CHECKLIST_ROOT: str = os.path.join(DATA_ROOT, "checklist")
     CRITERIAPROFILE_ROOT: str = os.path.join(DATA_ROOT, "criteriaprofile")
     MOCKDATA_ROOT: str = os.path.join(DATA_ROOT, "mockup")

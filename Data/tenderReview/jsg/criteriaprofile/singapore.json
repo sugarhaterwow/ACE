@@ -3,31 +3,33 @@
       "id": 1,
       "item": "Customer Information",
       "search_entities": ["Customer Name", "Contact Details", "Company Type"],
-      "analysis_type": "Search & Highlight"
+      "removed_entities": [],
+      "analysis_type": "Search & Highlight",
+      "selected": true
     },
     {
       "id": 2,
       "item": "Project Location",
-      "search_entities": ["Address", "City"],
-      "analysis_type": "Search & Highlight"
+      "search_entities": ["Address", "City", "Country"],
+      "removed_entities": [],
+      "analysis_type": "Search & Highlight",
+      "selected": true
     },
     {
       "id": 3,
       "item": "Installation Period",
       "search_entities": ["Timeline", "Deadline", "Milestone"],
-      "analysis_type": "Search & Highlight"
+      "removed_entities": [],
+      "analysis_type": "Search & Highlight",
+      "selected": true
     },
     {
       "id": 4,
-      "item": "Liability Terms",
-      "search_entities": ["Liability Limits", "Insurance Requirements"],
-      "analysis_type": "Search & Highlight"
-    },
-    {
-      "id": 5,
       "item": "Payment Terms",
       "search_entities": ["Payment Schedule", "Currency", "Tax Obligations"],
-      "analysis_type": "Search & Highlight"
+      "removed_entities": [],
+      "analysis_type": "Search & Highlight",
+      "selected": true
     }
   ]
   

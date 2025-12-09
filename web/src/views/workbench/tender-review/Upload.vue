@@ -129,73 +129,46 @@
 import { h, ref, watch, computed } from "vue"
 import { useMessage } from "naive-ui"
 import { DocumentTextOutline, DocumentAttachOutline, DocumentOutline } from "@vicons/ionicons5"
+import api from '@/api'
 
+// 获取父组件传过来的三个变量：项目名、已上传的文件和Next Page是否出现的标志
+const props = defineProps({
+  projectName: String,
+  file: {
+    type: Array,
+    default: () => []
+  },
+  hasSuccess: Boolean
+})
 
-const emit = defineEmits(['update:hasSuccess'])
-const props = defineProps<{ form: { uploadedFiles: any[] } }>()
-
+// 当父组件传来的两个变量变化，要告诉父组件以修改它的值
+const emit = defineEmits(['update:file', 'update:hasSuccess'])
+// 本地副本：上传的文件
+const uploadedFiles = ref([...(props.file ?? [])])
 const message = useMessage()
 
-const uploadedFiles = ref([])
 
-// 同步父组件传入的 form.uploadedFiles（用于刷新回显）
-watch(
-  () => props.form.uploadedFiles,
-  (newVal) => {
-    uploadedFiles.value = Array.isArray(newVal) ? [...newVal] : []
-  },
-  { immediate: true, deep: true }
-)
-
-
-// 监听文件状态变化，更新父组件的 hasSuccess
-watch(uploadedFiles, (files) => {
-  // ✅ 判断是否有成功文件
-  const hasSuccess = files.some(f => f.status === 'success')
-  emit('update:hasSuccess', hasSuccess)
-  
-}, { deep: true, immediate: true })
-
-
-// 文件选择处理
-const handleFileChange = ({ fileList }) => {
-  fileList.forEach(f => {
-    // 如果已存在同名文件，就跳过
-    if (!uploadedFiles.value.some(existing => existing.name === f.name)) {
+// 文件选择处理（每新增一个文件都会调用一次这个函数。）：只处理新增文件
+const handleFileChange = ({ file }) => {
+  // 判断是否已存在同名文件
+  if (!uploadedFiles.value.some(
+    existing =>
+      existing.name === file.name
+  )) {
       uploadedFiles.value.push({
-        name: f.name,
-        size: (f.file?.size / 1024).toFixed(2),
-        raw: f.file,
-        progress: 0,
-        status: "pending"
+        name: file.name,
+        size: (file.file?.size / 1024).toFixed(2), // KB
+        raw: file.file,                            // 原始 File 对象
+        progress: 0,                               // 初始进度
+        status: "pending"                          // 初始状态
       })
-    } else {
-      console.log("[change]uploadedFiles:", uploadedFiles.value)
-      message.warning(`File "${f.name}" already exists and will be skipped.`)
-    }
-  })
-}
-
-
-// 删除文件
-const handleFileDelete = (file) => {
-  // 删除你自己的文件列表
-  uploadedFiles.value = uploadedFiles.value.filter(f => f.name !== file.name)
-  console.log("[delete]uploadedFiles:", uploadedFiles.value)
-  // 更新父组件
-  const successfulFiles = uploadedFiles.value.filter(f => f.status === 'success')
-  props.form.uploadedFiles = successfulFiles
-  localStorage.setItem("tenderReviewSteps:0", JSON.stringify({ uploadedFiles: successfulFiles }))
-
-  // ❗ 同时清理 NaiveUI n-upload 内部的 fileList
-  // 因为你没有使用 v-model:file-list，必须手动清空
-  const upload = document.querySelector('.n-upload')
-  if (upload && upload.__vueParentComponent) {
-    upload.__vueParentComponent.ctx.fileList = []
+  } else {
+    message.warning(`File "${file.name}" already exists and will be skipped.`)
   }
 }
 
-// 上传所有文件
+
+// 上传文件
 const handleFileUpload = async () => {
   if (uploadedFiles.value.length === 0) {
     message.warning("No files to upload!")
@@ -210,62 +183,124 @@ const handleFileUpload = async () => {
     return
   }
 
-  message.info("Uploading files...")
-  const successFiles = []
-  const failedFiles = []
+  const formData = new FormData()
+  formData.append("folder", props.projectName) // 用父组件传来的 projectName
 
-  for (const file of pendingFiles) {
-    await uploadSingleFile(file)
-    if (file.status !== "success") {
-      failedFiles.push(file.name)
+  uploadedFiles.value.forEach(file => {
+    formData.append("files", file.raw)
+  })
+
+  try {
+    message.info("Uploading files...")
+    const res = await api.uploadFiles(formData)
+
+    message.success(res.msg)
+    console.log("成功上传:", res)
+
+    const successFiles = res.data.success || []
+    const failedFiles = res.data.failed || []
+
+    // 更新 uploadedFiles 的状态
+    uploadedFiles.value.forEach(f => {
+      if (successFiles.includes(f.name)) {
+        f.status = "success"
+        f.progress = 100
+      } else if (failedFiles.includes(f.name)) {
+        f.status = "failed"
+      }
+    })
+
+    // 把上传成功的文件更新到父表单里
+    const successfulFiles = uploadedFiles.value.filter(f => f.status === "success")
+    emit('update:file', JSON.parse(JSON.stringify(successfulFiles)))
+
+    // 更新 hasSuccess：只要有成功文件就设为 true
+    if (successfulFiles.length === 0) {
+      emit('update:hasSuccess', false)
+      message.warning("You must upload at least one file before proceeding to the next step.")
+    } else {
+      emit('update:hasSuccess', true)
     }
-    
-  }
-  const successfulFiles = uploadedFiles.value.filter(f => f.status === 'success')
-  props.form.uploadedFiles = successfulFiles
-  localStorage.setItem("tenderReviewSteps:0", JSON.stringify({uploadedFiles: successfulFiles}))
-
 
     if (failedFiles.length > 0) {
       message.error(`Some files failed to upload: ${failedFiles.join(", ")}`)
     } else {
       message.success("All new files uploaded successfully.")
     }
+  } catch (err) {
+    message.error("Upload failed: " + (err.response?.data?.message || err.message))
+    // 全部标记为失败
+    uploadedFiles.value.forEach(f => {
+      f.status = "failed"
+    })
+
+    // 同步失败状态给父组件
+    const successfulFiles = uploadedFiles.value.filter(f => f.status === "success")
+    emit('update:file', JSON.parse(JSON.stringify(successfulFiles)))
+    // 更新 hasSuccess：只要有成功文件就设为 true
+    if (successfulFiles.length === 0) {
+      emit('update:hasSuccess', false)
+      message.warning("You must upload at least one file before proceeding to the next step.")
+    } else {
+      emit('update:hasSuccess', true)
+    }
+  }
 }
 
+// 删除文件
+const handleFileDelete = async (file) => {
+  // 在 uploadedFiles 里查找匹配的文件
+  const target = uploadedFiles.value.find(
+    f => f.name === file.name)
+  // 判断状态
+  if (!target || target.status !== "success") {
+    message.warning(`File "${file.name}" has not been uploaded successfully and cannot be deleted.`)
+    return
+  }
+
+  // 调用后端删除接口
+  try {
+    const res = await api.deleteFile(props.projectName, file.name)
+    message.success(res.msg)
+    console.log("后端删除成功:", res)
+
+    // 删除前端文件列表
+    uploadedFiles.value = uploadedFiles.value.filter(
+      f => !(f.name === file.name)
+    )
+
+    console.log("Delete uploadedFiles:", uploadedFiles.value)
+
+    const successfulFiles = uploadedFiles.value.filter(f => f.status === "success")
+    emit('update:file', JSON.parse(JSON.stringify(successfulFiles)))
+    
+
+    // 判断是否还有成功文件
+    if (successfulFiles.length === 0) {
+      emit('update:hasSuccess', false)
+      message.warning("You must upload at least one file before proceeding to the next step.")
+    } else {
+      emit('update:hasSuccess', true)
+    }
 
 
-// 单个文件上传（带进度）
-function uploadSingleFile(file) {
-  return new Promise((resolve) => {
-    file.status = "uploading"
-    file.progress = 0
-    let progress = 0
+    // 清理 NaiveUI 内部 fileList
+    const upload = document.querySelector('.n-upload')
+    if (upload && upload.__vueParentComponent) {
+      upload.__vueParentComponent.ctx.fileList = []
+    }
 
-    const interval = setInterval(() => {
-      progress += 10
-      file.progress = progress
-
-      if (progress >= 100) {
-        clearInterval(interval)
-        const success = Math.random() > 0.1
-        if (success) {
-          file.status = "success"
-          file.progress = 100
-          resolve()
-        } else {
-          file.status = "error"
-          file.progress = 0
-          resolve()
-        }
-      }
-    }, 100)
-  })
+  } catch (err) {
+    message.error(`Failed to delete file: ${file.name}.`)
+    console.error("后端删除错误:", err)
+  }
+  
 }
+
 
 // 重试上传
 const retryUpload = async (file) => {
-  await uploadSingleFile(file)
+  await handleFileUpload()
 }
 
 // 模拟下载

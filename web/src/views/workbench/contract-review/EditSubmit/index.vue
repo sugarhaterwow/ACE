@@ -94,6 +94,7 @@ function connectorFillWidth(index) {
 watch(currentStage, async (val) => {
   if (val >= 2) {
     showSkeleton.value = false
+    visible.value = false
   }
   try {
       const res = await api.getAboutAnalysis()
